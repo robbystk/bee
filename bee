@@ -10,13 +10,38 @@ then
     echo "Usage: $0 <goal> <day> <data> [comment]" 
     exit 1
 else
+    # check data
     if [[ ! $3 =~ -?[0-9]+(\.[0-9]+)? ]]
     then
         echo "data must be a number"
         exit 3
     fi
 
-    echo "${base}users/${user}.json?auth_token=$key"
+    # make date
+    let day=$(date +%d)
+    let month=$(date +%m)
+
+    if [[ $2 == "^" ]]
+    then
+        # now
+        timestamp=$(date +%s)
+    else 
+        if [[ $2 -gt $day ]]
+        then
+            # last month
+            let month-=1
+        fi
+        timestamp=$(date -d "${month}/$2" +%s)
+        if [[ $? -ne 0 ]]
+        then
+            # invalid date
+            exit 0
+        fi
+    fi
+
+    echo $timestamp
+
+#     echo "${base}users/${user}.json?auth_token=$key"
     exit 0
 fi
 #'s/^.*"goals":\[\(.*\)\].*$/\1/'
