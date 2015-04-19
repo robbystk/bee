@@ -10,6 +10,13 @@ then
     echo "Usage: $0 <goal> <day> <data> [comment]" 
     exit 1
 else
+    if [[ ! $3 =~ -?[0-9]+(\.[0-9]+)? ]]
+    then
+        echo "data must be a number"
+        exit 3
+    fi
+
     echo "${base}users/${user}.json?auth_token=$key"
     exit 0
 fi
+#'s/^.*"goals":\[\(.*\)\].*$/\1/'
