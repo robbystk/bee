@@ -1,10 +1,15 @@
 #! /bin/bash
 
+base='https://www.beeminder.com/api/v1/'
+# user=''
+# key=''
+
+
 if [[ $# -ne 3 && $# -ne 4 ]]
 then
     echo "Usage: $0 <goal> <day> <data> [comment]" 
     exit 1
 else
-    echo "good"
+    echo "${base}users/${user}.json?auth_token=$key"
     exit 0
 fi
