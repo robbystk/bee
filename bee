@@ -8,7 +8,7 @@ base='https://www.beeminder.com/api/v1/'
 if [[ $# -ne 3 && $# -ne 4 ]]
 then
     echo "Usage: $0 <goal> <day> <data> [comment]" 
-    exit 1
+    exit 4
 else
     # check data
     if [[ ! $3 =~ ^-?[0-9]+(\.[0-9]+)?$ ]]
@@ -35,12 +35,11 @@ else
         if [[ $? -ne 0 ]]
         then
             # invalid date
-            exit 0
+            exit 2
         fi
     fi
 
-    # check goals
-    
+    # check if goal exists
     goals=$(curl -s "${base}users/${user}.json?auth_token=$key" |sed '#
         s/^.*"goals":\[\(.*\)\].*$/\1/' )
 
@@ -50,6 +49,10 @@ else
         exit 1
     fi
 
-    
+    # submit data
+    curl -sd "timestamp=${timestamp}&value=${3}&comment=${4}&auth_token=${key}" "${base}users/${user}/goals/${1}/datapoints.json" |sed 's/^.*\"status\":\"\([^"]*\)\".*$/\1\n/'
+
+    # get status
+    curl -s "${base}users/${user}/goals/${1}.json?auth_token=${key}" |sed 's/^.*\"headsum\":\"\([^"]*\)\".*$/\1\n/'
     exit 0
 fi
