@@ -1,0 +1,10 @@
+#! /bin/bash
+
+if [[ $# -ne 3 && $# -ne 4 ]]
+then
+    echo "Usage: $0 <goal> <day> <data> [comment]" 
+    exit 1
+else
+    echo "good"
+    exit 0
+fi
