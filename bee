@@ -7,13 +7,13 @@ base='https://www.beeminder.com/api/v1/'
 
 if [[ $# -ne 3 && $# -ne 4 ]]
 then
-    echo "Usage: $0 <goal> <day> <data> [comment]" 
+    echo "Usage: $0 <goal> <day> <data> [comment]" >&2
     exit 4
 else
     # check data
     if [[ ! $3 =~ ^-?[0-9]+(\.[0-9]+)?$ ]]
     then
-        echo "data must be a number"
+        echo "data must be a number" >&2
         exit 3
     fi
 
@@ -23,16 +23,16 @@ else
 
     if [[ $2 == "^" ]]
     then
-        # now
-        timestamp=$(date +%s)
+        # today
+        timestamp=$(date -d "${month}/${day}" +%s)
     else 
         if [[ $2 -gt $day ]]
         then
             # last month
             let month-=1
         fi
-        timestamp=$(date -d "${month}/$2" +%s)
-        if [[ $? -ne 0 ]]
+        timestamp=$(date -d "${month}/${2}" +%s)
+        if [[ $? != 0 ]]
         then
             # invalid date
             exit 2
@@ -40,12 +40,11 @@ else
     fi
 
     # check if goal exists
-    goals=$(curl -s "${base}users/${user}.json?auth_token=$key" |sed '#
-        s/^.*"goals":\[\(.*\)\].*$/\1/' )
+    goals=$(curl -s "${base}users/${user}.json?auth_token=$key" |sed 's/^.*"goals":\[\(.*\)\].*$/\1/')
 
     if [[ ! $goals =~ \"${1}\" ]]
     then
-        echo "Goal '$1' not found"
+        echo "Goal '$1' not found" >&2
         exit 1
     fi
 
