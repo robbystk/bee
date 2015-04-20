@@ -17,6 +17,9 @@ Exit status | Meaning
 3           | Datum is not a number
 4           | Wrong number of arguments
 
+Errors are checked in descending order, so if multiple errors exist, the largest
+exit status takes precedence.  
+
 ## Feedback
 I would love to hear all the ways this could be better, so if you think my code 
 is bad, email me at [robbystk@gmail.com](mailto:robbystk@gmail.com).  
