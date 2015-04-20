@@ -1,5 +1,5 @@
 # bee
-a bash script for submitting data to beeminder
+A bash script for submitting data to beeminder
 ## Usage
 ```
 > bee <goal> <day> <data> [comment]
@@ -16,3 +16,6 @@ Exit status | Meaning
 2           | Invalid day argument
 3           | Datum is not a number
 4           | Wrong number of arguments
+
+## Feedback
+I would love to hear all the ways this could be better, so if you think my code is bad, email me at [robbystk@gmail.com](mailto:robbystk@gmail.com).  
