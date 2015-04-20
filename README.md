@@ -6,13 +6,13 @@ a bash script for submitting data to beeminder
 ```
 Tells when datapoint has been created and then summarizes the goal status.  
 `<day>` should be the day of the month or `^` for today.  Multiple `^` (e.g. 
-`^^` for yesterday) are not supported
+`^^` for yesterday) are not supported.  
 
 ## Errors
 Exit status | Meaning
 ----------: | :---------
-0           | everything went properly
-1           | goal not found
-2           | invalid day argument
-3           | datum is not a number
-4           | wrong number of arguments
+0           | Everything went properly
+1           | Goal not found
+2           | Invalid day argument
+3           | Datum is not a number
+4           | Wrong number of arguments
