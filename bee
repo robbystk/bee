@@ -18,8 +18,8 @@ then
 fi
 
 # make date
-let day=$(date +%d)
-let month=$(date +%m)
+let day=$(date +%-d)
+let month=$(date +%-m)
 
 if [[ $2 == "^" ]]
 then
