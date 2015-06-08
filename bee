@@ -51,6 +51,7 @@ fi
 # submit data
 curl -sd "timestamp=${timestamp}&value=${3}&comment=${4}&auth_token=${key}" "${base}users/${user}/goals/${1}/datapoints.json" |sed 's/^.*\"status\":\"\([^"]*\)\".*$/\1\n/'
 
+exit 0
+
 # get status
 curl -s "${base}users/${user}/goals/${1}.json?auth_token=${key}" |sed 's/^.*\"headsum\":\"\([^"]*\)\".*$/\1\n/'
-exit 0
