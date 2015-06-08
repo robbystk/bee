@@ -4,53 +4,73 @@ base='https://www.beeminder.com/api/v1/'
 # user=''
 # key=''
 
-if [[ $# -ne 3 && $# -ne 4 ]]
-then
-    echo "Usage: $0 <goal> <day> <data> [comment]" >&2
-    exit 4
-fi 
+goal=$1
+date=$2
+data=$3
+comment=$4
 
-# check data
-if [[ ! $3 =~ ^-?[0-9]+(\.[0-9]+)?$ ]]
+function check_data {
+if [[ ! $data =~ ^-?[0-9]+(\.[0-9]+)?$ ]]
 then
     echo "data must be a number" >&2
     exit 3
 fi
+}
 
-# make date
+function process_date {
+# get current date
 let day=$(date +%-d)
 let month=$(date +%-m)
 
-if [[ $2 == "^" ]]
+if [[ $date == "^" ]]
 then
     # today
     timestamp=$(date -d "${month}/${day}" +%s)
 else 
-    if [[ $2 -gt $day ]]
+    if [[ $date -gt $day ]]
     then
         # last month
         let month-=1
     fi
-    timestamp=$(date -d "${month}/${2}" +%s)
+    timestamp=$(date -d "${month}/${date}" +%s)
     if [[ $? != 0 ]]
     then
         # invalid date
         exit 2
     fi
 fi
+}
 
+function check_goal {
 # check if goal exists
 goals=$(curl -s "${base}users/${user}.json?auth_token=$key" |sed 's/^.*"goals":\[\(.*\)\].*$/\1/')
 
-if [[ ! $goals =~ \"${1}\" ]]
+if [[ ! $goals =~ \"${goal}\" ]]
 then
-    echo "Goal '$1' not found" >&2
+    echo "Goal '$goal' not found" >&2
     exit 1
 fi
+}
 
+function submit {
 # submit data
-curl -sd "timestamp=${timestamp}&value=${3}&comment=${4}&auth_token=${key}" "${base}users/${user}/goals/${1}/datapoints.json" |sed 's/^.*\"status\":\"\([^"]*\)\".*$/\1\n/'
+curl -sd "timestamp=${timestamp}&value=${data}&comment=${comment}&auth_token=${key}" "${base}users/${user}/goals/${goal}/datapoints.json" |sed 's/^.*\"status\":\"\([^"]*\)\".*$/\1\n/'
+# echo "timestamp=${timestamp}&value=${data}&comment=${comment}&auth_token=${key}" "${base}users/${user}/goals/${goal}/datapoints.json" |sed 's/^.*\"status\":\"\([^"]*\)\".*$/\1\n/'
+}
 
+function goal_status {
 # get status
 curl -s "${base}users/${user}/goals/${1}.json?auth_token=${key}" |sed 's/^.*\"headsum\":\"\([^"]*\)\".*$/\1\n/'
+}
+
+if [[ $# -ne 3 && $# -ne 4 ]]
+then
+    echo "Usage: $0 <goal> <day> <data> [comment]" >&2
+    exit 4
+fi 
+
+check_data 
+process_date 
+check_goal 
+submit 
 exit 0
