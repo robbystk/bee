@@ -63,14 +63,19 @@ function goal_status() {
 curl -s "${base}users/${user}/goals/${1}.json?auth_token=${key}" |sed 's/^.*\"headsum\":\"\([^"]*\)\".*$/\1\n/'
 }
 
-if [[ $# -ne 3 && $# -ne 4 ]]
-then
-    echo "Usage: $0 <goal> <day> <data> [comment]" >&2
-    exit 4
-fi 
-
-check_data 
-process_date 
-check_goal 
-submit 
-exit 0
+case $# in
+    3|4 )
+        check_data 
+        process_date 
+        check_goal 
+        submit 
+        exit 0    
+    ;;
+    1 )
+        check_goal
+        goal_status
+    ;;
+    * )
+        echo "Usage: $0 <goal> <day> <data> [comment]" >&2
+        exit 4
+    ;;
