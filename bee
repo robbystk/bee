@@ -60,7 +60,7 @@ curl -sd "timestamp=${timestamp}&value=${data}&comment=${comment}&auth_token=${k
 
 function goal_status() {
 # get status
-curl -s "${base}users/${user}/goals/${1}.json?auth_token=${key}" |sed 's/^.*\"headsum\":\"\([^"]*\)\".*$/\1\n/'
+curl -s "${base}users/${user}/goals/${goal}.json?auth_token=${key}" |sed 's/^.*\"headsum\":\"\([^"]*\)\".*$/\1\n/'
 }
 
 case $# in
@@ -79,3 +79,4 @@ case $# in
         echo "Usage: $0 <goal> <day> <data> [comment]" >&2
         exit 4
     ;;
+esac
