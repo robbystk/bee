@@ -4,54 +4,88 @@ base='https://www.beeminder.com/api/v1/'
 # user=''
 # key=''
 
-if [[ $# -ne 3 && $# -ne 4 ]]
-then
-    echo "Usage: $0 <goal> <day> <data> [comment]" >&2
-    exit 4
-fi 
+goal=$1
+date=$2
+data=$3
+comment=$4
 
-# check data
-if [[ ! $3 =~ ^-?[0-9]+(\.[0-9]+)?$ ]]
+# check whether global variable $data is a number and exit if not
+function check_data() {
+if [[ ! $data =~ ^-?[0-9]+(\.[0-9]+)?$ ]]
 then
     echo "data must be a number" >&2
     exit 3
 fi
+}
 
-# make date
+# generate unix time $timestamp from $date
+# if date command cannot parse $date, exit
+function process_date() {
+# get current date
 let day=$(date +%-d)
 let month=$(date +%-m)
 
-if [[ $2 == "^" ]]
+if [[ $date == "^" ]]
 then
     # today
     timestamp=$(date -d "${month}/${day}" +%s)
 else 
-    if [[ $2 -gt $day ]]
+    if [[ $date -gt $day ]]
     then
         # last month
         let month-=1
     fi
-    timestamp=$(date -d "${month}/${2}" +%s)
+    timestamp=$(date -d "${month}/${date}" +%s)
     if [[ $? != 0 ]]
     then
         # invalid date
         exit 2
     fi
 fi
+}
 
-# check if goal exists
+# check if goal exists and exit if not
+function check_goal() {
 goals=$(curl -s "${base}users/${user}.json?auth_token=$key" |sed 's/^.*"goals":\[\(.*\)\].*$/\1/')
 
-if [[ ! $goals =~ \"${1}\" ]]
+if [[ ! $goals =~ \"${goal}\" ]]
 then
-    echo "Goal '$1' not found" >&2
+    echo "Goal '$goal' not found" >&2
     exit 1
 fi
+}
 
-# submit data
-curl -sd "timestamp=${timestamp}&value=${3}&comment=${4}&auth_token=${key}" "${base}users/${user}/goals/${1}/datapoints.json" |sed 's/^.*\"status\":\"\([^"]*\)\".*$/\1\n/'
+function submit() {
+# submit data and display status parameter from returned datapoint object
+curl -sd "timestamp=${timestamp}&value=${data}&comment=${comment}&auth_token=${key}" "${base}users/${user}/goals/${goal}/datapoints.json" |sed 's/^.*\"status\":\"\([^"]*\)\".*$/\1\n/'
 
-exit 0
+# this is for debugging
+# echo "timestamp=${timestamp}&value=${data}&comment=${comment}&auth_token=${key}" "${base}users/${user}/goals/${goal}/datapoints.json" |sed 's/^.*\"status\":\"\([^"]*\)\".*$/\1\n/'
+}
 
-# get status
-curl -s "${base}users/${user}/goals/${1}.json?auth_token=${key}" |sed 's/^.*\"headsum\":\"\([^"]*\)\".*$/\1\n/'
+function goal_status() {
+# extract and display 'headsum' parameter from returned json Goal object
+# see https://www.beeminder.com/api#goal
+curl -s "${base}users/${user}/goals/${goal}.json?auth_token=${key}" |sed 's/^.*\"headsum\":\"\([^"]*\)\".*$/\1\n/'
+}
+
+case $# in
+    3|4 )
+        # submit data point
+        check_data 
+        process_date 
+        check_goal 
+        submit 
+        exit 0    
+    ;;
+    1 )
+        # get goal status
+        check_goal
+        goal_status
+    ;;
+    * )
+        # wrong number of arguments
+        echo "Usage: $0 <goal> <day> <datum> [comment]" >&2
+        exit 4
+    ;;
+esac
