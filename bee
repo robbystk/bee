@@ -9,6 +9,7 @@ date=$2
 data=$3
 comment=$4
 
+# check whether global variable $data is a number and exit if not
 function check_data() {
 if [[ ! $data =~ ^-?[0-9]+(\.[0-9]+)?$ ]]
 then
@@ -17,6 +18,8 @@ then
 fi
 }
 
+# generate unix time $timestamp from $date
+# if date command cannot parse $date, exit
 function process_date() {
 # get current date
 let day=$(date +%-d)
@@ -41,8 +44,8 @@ else
 fi
 }
 
+# check if goal exists and exit if not
 function check_goal() {
-# check if goal exists
 goals=$(curl -s "${base}users/${user}.json?auth_token=$key" |sed 's/^.*"goals":\[\(.*\)\].*$/\1/')
 
 if [[ ! $goals =~ \"${goal}\" ]]
@@ -53,18 +56,22 @@ fi
 }
 
 function submit() {
-# submit data
+# submit data and display status parameter from returned datapoint object
 curl -sd "timestamp=${timestamp}&value=${data}&comment=${comment}&auth_token=${key}" "${base}users/${user}/goals/${goal}/datapoints.json" |sed 's/^.*\"status\":\"\([^"]*\)\".*$/\1\n/'
+
+# this is for debugging
 # echo "timestamp=${timestamp}&value=${data}&comment=${comment}&auth_token=${key}" "${base}users/${user}/goals/${goal}/datapoints.json" |sed 's/^.*\"status\":\"\([^"]*\)\".*$/\1\n/'
 }
 
 function goal_status() {
-# get status
+# extract and display 'headsum' parameter from returned json Goal object
+# see https://www.beeminder.com/api#goal
 curl -s "${base}users/${user}/goals/${goal}.json?auth_token=${key}" |sed 's/^.*\"headsum\":\"\([^"]*\)\".*$/\1\n/'
 }
 
 case $# in
     3|4 )
+        # submit data point
         check_data 
         process_date 
         check_goal 
@@ -72,10 +79,12 @@ case $# in
         exit 0    
     ;;
     1 )
+        # get goal status
         check_goal
         goal_status
     ;;
     * )
+        # wrong number of arguments
         echo "Usage: $0 <goal> <day> <datum> [comment]" >&2
         exit 4
     ;;
