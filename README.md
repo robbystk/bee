@@ -1,12 +1,20 @@
 # bee
 A bash script for submitting data to beeminder
 ## Usage
+### Submit a data point
 ```
-> bee <goal> <day> <data> [comment]
+> bee <goal> <day> <datum> [comment]
 ```
-Tells when datapoint has been created and then summarizes the goal status.  
+Tells when datapoint has been created. 
 `<day>` should be the day of the month or `^` for today.  Multiple `^` (e.g. 
 `^^` for yesterday) are not supported.  
+
+### Viewing goal status
+```
+> bee <goal>
+```
+Displays a summary of where you are with respect to the goal, e.g., "On 
+track", "In the wrong lane", "In danger of derailing tomorrow".  
 
 ## Errors
 Exit status | Meaning
