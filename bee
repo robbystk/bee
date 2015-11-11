@@ -85,7 +85,7 @@ case $# in
     ;;
     * )
         # wrong number of arguments
-        echo "Usage: $0 <goal> <day> <datum> [comment]" >&2
+        echo "Usage: $(basename $0) <goal> <day> <datum> [comment]" >&2
         exit 4
     ;;
 esac
