@@ -1,5 +1,5 @@
 # bee
-A bash script for submitting data to beeminder
+A bash script for submitting data to [beeminder](https://www.beeminder.com/)
 ## Usage
 ### Submit a data point
 ```
