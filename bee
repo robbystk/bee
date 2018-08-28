@@ -1,8 +1,6 @@
 #! /bin/bash
 
 base='https://www.beeminder.com/api/v1/'
-# user=''
-# key=''
 
 goal=$1
 date=$2
@@ -69,17 +67,29 @@ function goal_status() {
 curl -s "${base}users/${user}/goals/${goal}.json?auth_token=${key}" |sed 's/^.*\"headsum\":\"\([^"]*\)\".*$/\1\n/'
 }
 
+function get_credentials() {
+    if [[ -e ~/.beeminder ]]
+    then
+        . ~/.beeminder
+    else
+        echo "Credential file ~/.beeminder not found" >&2
+        exit 5
+    fi
+}
+
 case $# in
     3|4 )
         # submit data point
         check_data 
         process_date 
+        get_credentials
         check_goal 
         submit 
         exit 0    
     ;;
     1 )
         # get goal status
+        get_credentials
         check_goal
         goal_status
     ;;
