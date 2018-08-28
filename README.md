@@ -34,9 +34,10 @@ Exit status | Meaning
 ----------: | :---------
 0           | Everything went properly
 1           | Goal not found
-2           | Invalid day argument
-3           | Datum is not a number
-4           | Wrong number of arguments
+2           | Configuration file not found
+3           | Invalid day argument
+4           | Datum is not a number
+5           | Wrong number of arguments
 
 Errors are checked in descending order, so if multiple errors exist, the largest
 exit status takes precedence.  
